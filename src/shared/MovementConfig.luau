@@ -26,11 +26,10 @@ return {
     FovResponse = 8,
     JumpFovPulse = 2.2,
     JumpFovRecovery = 8,
-    StrafeLeanDegrees = 0.65,
+    StrafeSwayStuds = 0.025,
     EnableHeadBob = true,
     HeadBobAmplitude = 0.018,
     HeadBobFrequency = 10,
     LandingDip = 0.11,
-    LandingPitchDegrees = 1.2,
     LandingRecovery = 12
 }

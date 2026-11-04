@@ -1,4 +1,5 @@
 -- Native Roblox first-person aiming with restrained speed and jump feedback.
+-- Never rotate camera.CFrame: the CoreCamera can reuse that orientation next frame.
 -- Roblox does not expose a true fisheye lens here; widening FOV is the safe approximation.
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -18,7 +19,7 @@ local lastGrounded = true
 local worstFallSpeed = 0
 local lastJumpStamp = 0
 local jumpKick = 0
-local strafeRoll = 0
+local strafeSway = 0
 
 local function attachCharacter(character)
     local nextHumanoid = character:WaitForChild("Humanoid")
@@ -29,7 +30,7 @@ local function attachCharacter(character)
 
     humanoid, root = nextHumanoid, nextRoot
     bobClock, bobWeight, landingStrength = 0, 0, 0
-    jumpKick, strafeRoll = 0, 0
+    jumpKick, strafeSway = 0, 0
     lastJumpStamp = 0
     lastGrounded = nextHumanoid.FloorMaterial ~= Enum.Material.Air
     worstFallSpeed = 0
@@ -39,6 +40,7 @@ end
 
 player.CharacterRemoving:Connect(function(character)
     if humanoid and humanoid.Parent == character then
+        humanoid.CameraOffset = Vector3.zero
         humanoid, root = nil, nil
     end
 end)
@@ -49,7 +51,7 @@ end
 player.CameraMode = Enum.CameraMode.LockFirstPerson
 UserInputService.MouseIconEnabled = false
 
-RunService:BindToRenderStep("MageSlayerFirstPersonCamera", Enum.RenderPriority.Camera.Value + 1, function(dt)
+RunService:BindToRenderStep("MageSlayerFirstPersonCamera", Enum.RenderPriority.Camera.Value - 1, function(dt)
     local camera = workspace.CurrentCamera
     if not camera then
         return
@@ -83,6 +85,9 @@ RunService:BindToRenderStep("MageSlayerFirstPersonCamera", Enum.RenderPriority.C
         * MovementMath.smoothingAlpha(Config.FovResponse, dt)
 
     if not alive then
+        if humanoid then
+            humanoid.CameraOffset = Vector3.zero
+        end
         return
     end
 
@@ -108,10 +113,10 @@ RunService:BindToRenderStep("MageSlayerFirstPersonCamera", Enum.RenderPriority.C
         - landingStrength * Config.LandingDip + jumpKick * 0.012
 
     local strafe = if moving then humanoid.MoveDirection:Dot(camera.CFrame.RightVector) else 0
-    local targetRoll = -strafe * Config.StrafeLeanDegrees * speedRatio
-    strafeRoll += (targetRoll - strafeRoll) * MovementMath.smoothingAlpha(10, dt)
+    local targetSway = -strafe * Config.StrafeSwayStuds * speedRatio
+    strafeSway += (targetSway - strafeSway) * MovementMath.smoothingAlpha(10, dt)
 
-    camera.CFrame = camera.CFrame
-        * CFrame.new(xBob, yBob, 0)
-        * CFrame.Angles(math.rad(landingStrength * Config.LandingPitchDegrees), 0, math.rad(strafeRoll))
+    -- An ABSOLUTE character-relative offset, consumed by CoreCamera on this frame.
+    -- Unlike multiplying camera.CFrame each tick, this cannot accumulate pitch/roll.
+    humanoid.CameraOffset = Vector3.new(xBob + strafeSway, yBob, 0)
 end)

@@ -54,7 +54,10 @@ class MovementContractTests(unittest.TestCase):
         source = (CLIENT / "FirstPersonCamera.client.luau").read_text(encoding="utf-8")
         self.assertIn("LockFirstPerson", source)
         self.assertIn("BindToRenderStep", source)
-        self.assertIn("Enum.RenderPriority.Camera.Value + 1", source)
+        self.assertIn("Enum.RenderPriority.Camera.Value - 1", source)
+        self.assertIn("humanoid.CameraOffset = Vector3.new(", source)
+        self.assertNotIn("camera.CFrame =", source)
+        self.assertNotIn("CFrame.Angles(", source)
         self.assertNotIn("Enum.CameraType.Scriptable", source)
 
     def test_base_kit_has_no_reserved_abilities(self):

@@ -23,7 +23,7 @@ Rojo files map to `ReplicatedStorage`, `StarterPlayerScripts`, and `ServerScript
 | Chain jumps | Hold Space or gamepad jump, or time repeated taps | Auto-hop on landing for keyboard/gamepad, quick consecutive hops stack a bonus up to **36 studs/s** |
 | Forgiveness | Jump near a ledge or landing | **100 ms coyote time** and **120 ms input buffer** |
 
-The default Roblox character controller handles movement, collision, and input. The camera uses native first-person aiming with speed-dependent wide FOV (80→90°, with brief +2.2° jump pulse), a very small strafe lean, head bob and a short landing dip; this approximates fisheye without a custom lens shader. Turn off `EnableHeadBob` in `src/shared/MovementConfig.luau` if necessary. Tune all numeric values in that module.
+The default Roblox character controller handles movement, collision, and input. The camera uses native first-person aiming with speed-dependent wide FOV (80→90°, with brief +2.2° jump pulse), a tiny non-rotating strafe sway, head bob and a short landing dip; this approximates fisheye without a custom lens shader. Camera effects use an absolute Humanoid.CameraOffset and never change the aim orientation. Turn off `EnableHeadBob` in `src/shared/MovementConfig.luau` if necessary. Tune all numeric values in that module.
 
 **Not in M0.1:** slide, dash, double jump, wall jump, flight, stamina, movement skills, magic, VFX and production animation.
 
