@@ -1,0 +1,12 @@
+# Generated Rojo places / local Studio files
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+*.rbxl.lock
+
+# Local editor and test artifacts
+.DS_Store
+.vscode/
+__pycache__/
+.pytest_cache/
