@@ -1,4 +1,4 @@
-name: Validate M0
+name: Validate MageSlayer prototype
 
 on:
   push:
@@ -33,6 +33,9 @@ jobs:
 
       - name: MovementMath runtime tests
         run: /tmp/mageslayer-luau/luau tests/MovementMath.spec.luau
+
+      - name: FireballMath runtime tests
+        run: /tmp/mageslayer-luau/luau tests/FireballMath.spec.luau
 
       - name: Build Roblox place (official pinned Rojo)
         shell: bash

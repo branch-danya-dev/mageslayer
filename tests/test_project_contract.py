@@ -67,5 +67,37 @@ class MovementContractTests(unittest.TestCase):
             self.assertNotIn(ability, source)
 
 
+class FireballContractTests(unittest.TestCase):
+    def test_fireball_definition_and_left_hand_only(self):
+        config = (SHARED / "FireballConfig.luau").read_text(encoding="utf-8")
+        self.assertIn('Id = "Fireball"', config)
+        self.assertIn('School = "Fire"', config)
+        self.assertIn('Element = "Fire"', config)
+        self.assertIn('AllowedHand = "Left"', config)
+        self.assertRegex(config, r"CastInterval\s*=\s*0\.30")
+
+    def test_client_input_and_predicted_visuals(self):
+        controller = (CLIENT / "FireballController.client.luau").read_text(encoding="utf-8")
+        self.assertIn("MouseButton1", controller)
+        self.assertNotIn("MouseButton2", controller)
+        self.assertIn("lastLocalCastAt", controller)
+        self.assertIn("Visuals.spawn", controller)
+        self.assertIn("castRequest:FireServer", controller)
+
+    def test_server_validates_and_resolves_hits(self):
+        server = (ROOT / "src" / "server" / "FireballServer.server.luau").read_text(encoding="utf-8")
+        for name in ("OnServerEvent", "isValidShotId", "isFiniteVector", "canCast",
+                     "FilterDescendantsInstances", "Spherecast", "TakeDamage",
+                     "Config.AllowedHand", "Config.Id"):
+            with self.subTest(name=name):
+                self.assertIn(name, server)
+
+    def test_visuals_do_not_modify_camera_orientation(self):
+        visuals = (CLIENT / "FireballVisuals.luau").read_text(encoding="utf-8")
+        for name in ("Trail", "ParticleEmitter", "PointLight", "TweenService"):
+            self.assertIn(name, visuals)
+        self.assertNotIn("camera.CFrame =", visuals)
+
+
 if __name__ == "__main__":
     unittest.main()
