@@ -1,0 +1,46 @@
+name: Validate M0
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  movement:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Project contract
+        run: python -m unittest discover -s tests -v
+
+      - name: Luau syntax (official pinned compiler)
+        shell: bash
+        run: |
+          curl --fail --location --retry 3 \
+            https://github.com/luau-lang/luau/releases/download/0.745/luau-ubuntu.zip \
+            --output /tmp/luau-ubuntu.zip
+          echo "186e5ddaa2b048ebc7390c11ed1b00c04e7d3beaffed429250329e3575d2ece2  /tmp/luau-ubuntu.zip" | sha256sum --check -
+          mkdir -p /tmp/mageslayer-luau
+          unzip -q /tmp/luau-ubuntu.zip -d /tmp/mageslayer-luau
+          while IFS= read -r -d '' source; do
+            /tmp/mageslayer-luau/luau-compile "$source" >/dev/null
+          done < <(find src tests -name '*.luau' -print0)
+
+      - name: MovementMath runtime tests
+        run: /tmp/mageslayer-luau/luau tests/MovementMath.spec.luau
+
+      - name: Build Roblox place (official pinned Rojo)
+        shell: bash
+        run: |
+          curl --fail --location --retry 3 \
+            https://github.com/rojo-rbx/rojo/releases/download/v7.6.0/rojo-7.6.0-linux-x86_64.zip \
+            --output /tmp/rojo-7.6.0.zip
+          echo "f0373a2f9653dd3ab724a36c6fabc6400a0732d49e4ad233c5353a72372f78f4  /tmp/rojo-7.6.0.zip" | sha256sum --check -
+          mkdir -p /tmp/mageslayer-rojo
+          unzip -q /tmp/rojo-7.6.0.zip -d /tmp/mageslayer-rojo
+          /tmp/mageslayer-rojo/rojo build -o /tmp/MageSlayer.rbxlx
