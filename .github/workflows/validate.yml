@@ -29,7 +29,10 @@ jobs:
           unzip -q /tmp/luau-ubuntu.zip -d /tmp/mageslayer-luau
           while IFS= read -r -d '' source; do
             /tmp/mageslayer-luau/luau-compile "$source" >/dev/null
-          done < <(find src -name '*.luau' -print0)
+          done < <(find src tests -name '*.luau' -print0)
+
+      - name: MovementMath runtime tests
+        run: /tmp/mageslayer-luau/luau tests/MovementMath.spec.luau
 
       - name: Build Roblox place (official pinned Rojo)
         shell: bash

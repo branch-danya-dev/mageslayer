@@ -26,7 +26,11 @@ class MovementContractTests(unittest.TestCase):
         config = (SHARED / "MovementConfig.luau").read_text(encoding="utf-8")
         for field, expected in (
             ("BaseRunSpeed", "20"),
-            ("MaxRunSpeed", "25"),
+            ("MaxRunSpeed", "30"),
+            ("JumpChargeGain", "0.14"),
+            ("HopChainWindow", "0.24"),
+            ("HopBonusCap", "6"),
+            ("MaxSpeedFovBonus", "10"),
             ("RunChargeSeconds", "2.0"),
             ("JumpHeight", "8"),
             ("CoyoteSeconds", "0.10"),
@@ -41,6 +45,7 @@ class MovementContractTests(unittest.TestCase):
             "CharacterAdded", "CharacterRemoving", "JumpRequest", "MoveDirection",
             "AssemblyLinearVelocity", "consumedJump", "bufferedJumpUntil",
             "lastGroundedAt", "HumanoidStateType.Jumping", "WalkSpeed",
+            "hopStreak", "hopBonus", "jumpHeld", "awardTakeoff",
         ):
             with self.subTest(token=token):
                 self.assertIn(token, source)
