@@ -1,6 +1,6 @@
 # MageSlayer
 
-M0.1 first-person movement prototype for a Roblox magic action roguelite. No combat, spells, progression or lobby yet.
+M1 first-person movement and fireball prototype for a Roblox magic action roguelite. One test fireball is always available on LMB; no spell inventory, animations, progression or lobby yet.
 
 ## Play in Roblox Studio
 
@@ -27,9 +27,27 @@ The default Roblox character controller handles movement, collision, and input. 
 
 **Not in M0.1:** slide, dash, double jump, wall jump, flight, stamina, movement skills, magic, VFX and production animation.
 
+## M1: Fireball (left hand only)
+
+- **LMB:** fire a single fireball from the left side. **Hold LMB** to fire repeatedly at 0.30 s intervals.
+- **Aim:** center reticle and native first-person mouse look. **RMB is reserved** for a future right-hand cast and does nothing now.
+- **Visuals:** instant local muzzle flash, orange emissive projectile with a trail/embers, small impact burst; a temporary sample activation sound.
+- **Physics:** fast projectile (175 studs/s), up to 145 studs, radius 0.58. The server checks the hand/spell request and cooldown, casts a sphere for hit detection, and can damage a struck Humanoid (placeholder 18 damage).
+- **Architecture:** client predicts visuals for immediate feedback; the server owns collision/damage and replicates spawn/impact/expiry to all clients. Spell metadata names Fire as both school and element, and records future one-/two-hand support without exposing a second-hand mechanic.
+
+### Required Studio checks for the fireball
+
+1. Spawn and fire a single ball by tapping LMB; hold LMB and verify regular fire without stalling the run/bunnyhop.
+2. Shoot the floor, stairs and walls: the fireball should burst on the first hit, not pass through it.
+3. Test two Studio clients: the other client must see each projectile and its impact, while server damage is applied at most once.
+4. Click in a menu or unfocus Studio: casting must not continue indefinitely. RMB should do nothing.
+5. Confirm the old camera-pitch-drift bug has not returned.
+
+The cast audio uses a Roblox tutorial sample sound as a temporary stand-in. VFX intensity, sound design, cooldown, damage and resource costs still require design/play-test passes. No gameplay is balanced yet.
+
 ## Validation
 
-The GitHub workflow runs Python project-contract checks, the pinned official Luau compiler and MovementMath runtime tests, and an official Rojo place build. To run local contract checks:
+The GitHub workflow runs Python contract checks, official pinned Luau compiler syntax checks, MovementMath and FireballMath runtime tests, and an official Rojo place build. To run local contract checks:
 
 ```sh
 python -m unittest discover -s tests -v
